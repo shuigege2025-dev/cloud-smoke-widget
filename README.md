@@ -45,9 +45,18 @@
 
 本插件是一个 **DSH Cordis 客户端插件**，注册在 `shell.overlay` 浮层槽位，需要 DSH 提供 `ctx` / `React` / `styles` 内建与 `slots` / `timer` 服务。
 
-**把下面这条消息复制发给任意 DSH 会话，它会自动下载源码并用 Cordis 定义、运行插件：**
+**复制下面这条消息发给任意 DSH 会话即可：**
 
-````text
+```text
+帮我安装这个 DSH 插件：https://github.com/shuigege2025-dev/cloud-smoke-widget
+```
+
+安装成功后，小组件会出现在 DSH 界面的右下角浮层。
+
+<details>
+<summary>详细版提示词（短版装不上时用）</summary>
+
+```text
 帮我安装这个仓库的 DSH 插件到我的 DSH：https://github.com/shuigege2025-dev/cloud-smoke-widget
 
 安装步骤：
@@ -55,9 +64,9 @@
 2. 用 cordis_define 把它定义为新插件：plugin 参数用 {"kind": "new", "idPrefix": "cloudsmoke"}，name 填「云抽烟小组件」，purpose 简述「等待 AI 时的解压互动玩具」，code.client 填第 1 步拿到的完整源码原文
 3. 用 cordis_run 运行它：pluginId 和 packageId 填第 2 步返回的值，mode 填 "run"
 4. 运行成功后告诉我，组件应出现在 DSH 界面右下角浮层
-````
+```
 
-安装成功后，小组件会出现在 DSH 界面的右下角浮层。
+</details>
 
 > 备选方式：打开 [`src/cloud-smoke-widget.js`](src/cloud-smoke-widget.js) 手动复制全部代码发给 agent，让它「用 Cordis 把这段代码作为客户端插件运行」。
 
