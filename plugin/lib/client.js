@@ -23,7 +23,7 @@ const RING_FILTER_A = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://w
 const RING_FILTER_B = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter%20id='fb'%20x='-30%25'%20y='-30%25'%20width='160%25'%20height='160%25'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.055%200.032'%20numOctaves='2'%20seed='21'%20result='n'/%3E%3CfeDisplacementMap%20in='SourceGraphic'%20in2='n'%20scale='32'%20xChannelSelector='R'%20yChannelSelector='G'/%3E%3C/filter%3E%3C/svg%3E#fb"
 const SMOKE_FILTER = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter%20id='fs'%20x='-30%25'%20y='-30%25'%20width='160%25'%20height='160%25'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.015%200.02'%20numOctaves='2'%20seed='5'%20result='n'/%3E%3CfeDisplacementMap%20in='SourceGraphic'%20in2='n'%20scale='18'%20xChannelSelector='R'%20yChannelSelector='G'/%3E%3C/filter%3E%3C/svg%3E#fs"
 const SOUND_BASE = '/plugins/dsh-client-cloud-smoke-widget/assets/sounds/'
-const VERSION = '1.2.0'
+const VERSION = '1.2.1'
 const REPO_URL = 'https://github.com/shuigege2025-dev/cloud-smoke-widget'
 const UPDATE_URLS = [
   '/plugins/dsh-client-cloud-smoke-widget/latest-version',
@@ -257,6 +257,10 @@ const CSS = `
 .ycs-upd-txt { color: rgba(255,255,255,.45); }
 .ycs-ghost.badge { color: #ffd77a; animation: ycs-badge-pulse 2s ease-in-out infinite; }
 @keyframes ycs-badge-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+.ycs-btn-share { flex: 1; height: 38px; border: 0; border-radius: 12px; cursor: pointer; font-size: 12.5px; font-weight: 700; letter-spacing: .6px; color: #fff; background: linear-gradient(110deg, #ff9a3d 0%, #ff6b4a 25%, #ffb45e 50%, #ff6b4a 75%, #ff9a3d 100%); background-size: 220% 100%; animation: ycs-share-shimmer 3.2s linear infinite; box-shadow: 0 5px 18px rgba(255,140,60,.4), inset 0 1px 0 rgba(255,255,255,.3); transition: transform .12s ease, filter .15s ease; }
+.ycs-btn-share:hover { transform: translateY(-1px); filter: brightness(1.08); }
+.ycs-btn-share:active { transform: scale(.97); }
+@keyframes ycs-share-shimmer { 0% { background-position: 0% 0; } 100% { background-position: -220% 0; } }
 .ycs-sc-worker .ycs-blinds { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(210,220,255,.05) 0 9px, rgba(0,0,10,.16) 9px 20px); }
 .ycs-sc-worker .ycs-officelight { position: absolute; top: -60px; right: -40px; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(closest-side, rgba(170,195,255,.28), rgba(170,195,255,0) 70%); }
 .ycs-sc-worker .ycs-desklamp { position: absolute; bottom: -30px; left: -30px; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,214,150,.16), rgba(255,214,150,0) 70%); }
@@ -287,7 +291,7 @@ const CSS = `
 .ycs-pill { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border: 1px solid rgba(255,255,255,.1); border-radius: 999px; background: linear-gradient(155deg, rgba(38,41,52,.93), rgba(14,16,22,.96)); box-shadow: 0 14px 38px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.07); cursor: grab; color: rgba(255,255,255,.92); font-size: 12.5px; font-weight: 600; letter-spacing: .4px; transition: transform .15s ease, box-shadow .2s ease; touch-action: none; }
 .ycs-pill:hover { transform: translateY(-2px); box-shadow: 0 18px 44px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.07); }
 .ycs-pill:active { cursor: grabbing; }
-@media (prefers-reduced-motion: reduce) { .ycs-ember, .ycs-dot.lit, .ycs-smoke, .ycs-spark, .ycs-ashbit, .ycs-ring, .ycs-smoke-body, .ycs-ring-body { animation: none !important; } .ycs-tray.tipping { animation: none !important; } .ycs-flash, .ycs-scene .ycs-code, .ycs-scene .ycs-bubble, .ycs-scene .ycs-cloudband, .ycs-card.t-cyber .ycs-title { animation: none !important; } .ycs-ash, .ycs-paper, .ycs-mound { transition: none; } .ycs-shake { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .ycs-ember, .ycs-dot.lit, .ycs-smoke, .ycs-spark, .ycs-ashbit, .ycs-ring, .ycs-smoke-body, .ycs-ring-body { animation: none !important; } .ycs-tray.tipping { animation: none !important; } .ycs-flash, .ycs-scene .ycs-code, .ycs-scene .ycs-bubble, .ycs-scene .ycs-cloudband, .ycs-card.t-cyber .ycs-title, .ycs-panel, .ycs-ghost.badge, .ycs-btn-share { animation: none !important; } .ycs-ash, .ycs-paper, .ycs-mound { transition: none; } .ycs-shake { animation: none; } }
 `
 
 function makeFallbackTimer() {
@@ -947,12 +951,12 @@ function CloudSmokeWidget(props) {
           'aria-label': muted ? '开启声音' : '关闭声音',
           onClick: toggleMute
         }, muted ? '🔇' : '🔊'),
-        React.createElement('button', {
-          className: hasUpdate ? 'ycs-ghost badge' : 'ycs-ghost',
-          title: hasUpdate ? '发现新版本 v' + update.version + '，点击查看' : '派烟给朋友 · 邀请一起云抽烟',
-          'aria-label': '派烟给朋友',
+        hasUpdate && React.createElement('button', {
+          className: 'ycs-ghost badge',
+          title: '发现新版本 v' + update.version + '，点击查看',
+          'aria-label': '发现新版本',
           onClick: () => setPanelOpen(true)
-        }, hasUpdate ? '🆕' : '🚬'),
+        }, '🆕'),
         React.createElement('button', {
           className: 'ycs-ghost',
           title: '收起为悬浮球',
@@ -1101,6 +1105,13 @@ function CloudSmokeWidget(props) {
             'aria-label': '换一支新的香烟',
             onClick: reset
           }, T.bReset)
+        ),
+        React.createElement('div', { className: 'ycs-row' },
+          React.createElement('button', {
+            className: 'ycs-btn-share',
+            title: '邀请朋友一起云抽烟',
+            onClick: () => setPanelOpen(true)
+          }, '🚬 派烟给朋友 · 一起云抽烟')
         )
       ),
       React.createElement('div', { className: 'ycs-foot' },

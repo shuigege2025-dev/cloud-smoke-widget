@@ -1,7 +1,7 @@
 const MAX_ASH = 169
 const CIG_W = 218
 const TIP_X = (268 - CIG_W) / 2 + CIG_W
-const VERSION = '1.2.0'
+const VERSION = '1.2.1'
 const REPO_URL = 'https://github.com/shuigege2025-dev/cloud-smoke-widget'
 const UPDATE_URLS = [
   '/plugins/dsh-client-cloud-smoke-widget/latest-version',
@@ -213,6 +213,10 @@ const CSS = `
 .ycs-btn-ring { background: linear-gradient(160deg, var(--ycs-btnr-a) 0%, var(--ycs-btnr-b) 100%); box-shadow: 0 5px 16px color-mix(in srgb, var(--ycs-btnr-a) 40%, transparent), inset 0 1px 0 rgba(255,255,255,.24); }
 .ycs-btn-reset { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.85); }
 .ycs-btn-reset:hover { background: rgba(255,255,255,.12); }
+.ycs-btn-share { flex: 1; height: 38px; border: 0; border-radius: 12px; cursor: pointer; font-size: 12.5px; font-weight: 700; letter-spacing: .6px; color: #fff; background: linear-gradient(110deg, #ff9a3d 0%, #ff6b4a 25%, #ffb45e 50%, #ff6b4a 75%, #ff9a3d 100%); background-size: 220% 100%; animation: ycs-share-shimmer 3.2s linear infinite; box-shadow: 0 5px 18px rgba(255,140,60,.4), inset 0 1px 0 rgba(255,255,255,.3); transition: transform .12s ease, filter .15s ease; }
+.ycs-btn-share:hover { transform: translateY(-1px); filter: brightness(1.08); }
+.ycs-btn-share:active { transform: scale(.97); }
+@keyframes ycs-share-shimmer { 0% { background-position: 0% 0; } 100% { background-position: -220% 0; } }
 .ycs-foot { padding: 0 14px 11px; text-align: center; font-size: 10px; letter-spacing: .3px; color: rgba(255,255,255,.34); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; z-index: 1; }
 .ycs-panel { position: absolute; inset: 0; z-index: 6; display: flex; flex-direction: column; gap: 10px; padding: 14px; background: linear-gradient(165deg, rgba(26,29,39,.98), rgba(10,12,18,.99)); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 20px; animation: ycs-panel-in .22s ease; overflow-y: auto; }
 @keyframes ycs-panel-in { from { opacity: 0; transform: scale(.93) translateY(6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
@@ -269,7 +273,7 @@ const CSS = `
 .ycs-pill { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border: 1px solid rgba(255,255,255,.1); border-radius: 999px; background: linear-gradient(155deg, rgba(38,41,52,.93), rgba(14,16,22,.96)); box-shadow: 0 14px 38px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.07); cursor: grab; color: rgba(255,255,255,.92); font-size: 12.5px; font-weight: 600; letter-spacing: .4px; transition: transform .15s ease, box-shadow .2s ease; touch-action: none; }
 .ycs-pill:hover { transform: translateY(-2px); box-shadow: 0 18px 44px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.07); }
 .ycs-pill:active { cursor: grabbing; }
-@media (prefers-reduced-motion: reduce) { .ycs-ember, .ycs-dot.lit, .ycs-smoke, .ycs-spark, .ycs-ashbit, .ycs-ring, .ycs-smoke-body, .ycs-ring-body { animation: none !important; } .ycs-tray.tipping { animation: none !important; } .ycs-flash, .ycs-scene .ycs-code, .ycs-scene .ycs-bubble, .ycs-scene .ycs-cloudband, .ycs-card.t-cyber .ycs-title, .ycs-panel, .ycs-ghost.badge { animation: none !important; } .ycs-ash, .ycs-paper, .ycs-mound { transition: none; } .ycs-shake { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .ycs-ember, .ycs-dot.lit, .ycs-smoke, .ycs-spark, .ycs-ashbit, .ycs-ring, .ycs-smoke-body, .ycs-ring-body { animation: none !important; } .ycs-tray.tipping { animation: none !important; } .ycs-flash, .ycs-scene .ycs-code, .ycs-scene .ycs-bubble, .ycs-scene .ycs-cloudband, .ycs-card.t-cyber .ycs-title, .ycs-panel, .ycs-ghost.badge, .ycs-btn-share { animation: none !important; } .ycs-ash, .ycs-paper, .ycs-mound { transition: none; } .ycs-shake { animation: none; } }
 `
 
 function makeFallbackTimer() {
@@ -934,12 +938,12 @@ function CloudSmokeWidget(props) {
           'aria-label': muted ? '开启声音' : '关闭声音',
           onClick: toggleMute
         }, muted ? '🔇' : '🔊'),
-        React.createElement('button', {
-          className: hasUpdate ? 'ycs-ghost badge' : 'ycs-ghost',
-          title: hasUpdate ? '发现新版本 v' + update.version + '，点击查看' : '派烟给朋友 · 邀请一起云抽烟',
-          'aria-label': '派烟给朋友',
+        hasUpdate && React.createElement('button', {
+          className: 'ycs-ghost badge',
+          title: '发现新版本 v' + update.version + '，点击查看',
+          'aria-label': '发现新版本',
           onClick: () => setPanelOpen(true)
-        }, hasUpdate ? '🆕' : '🚬'),
+        }, '🆕'),
         React.createElement('button', {
           className: 'ycs-ghost',
           title: '收起为悬浮球',
@@ -1088,6 +1092,13 @@ function CloudSmokeWidget(props) {
             'aria-label': '换一支新的香烟',
             onClick: reset
           }, T.bReset)
+        ),
+        React.createElement('div', { className: 'ycs-row' },
+          React.createElement('button', {
+            className: 'ycs-btn-share',
+            title: '邀请朋友一起云抽烟',
+            onClick: () => setPanelOpen(true)
+          }, '🚬 派烟给朋友 · 一起云抽烟')
         )
       ),
       React.createElement('div', { className: 'ycs-foot' },
