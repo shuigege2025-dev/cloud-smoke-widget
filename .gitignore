@@ -1,0 +1,13 @@
+# 本地工具与依赖
+node_modules/
+.tools/
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+
+# 会话/私有文件
+*.local.md
+AGENTS.local.md

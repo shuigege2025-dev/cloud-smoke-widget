@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>云抽烟 · Cloud Smoke Widget — 浏览器演示</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      background:
+        radial-gradient(900px 500px at 18% 12%, rgba(88, 118, 255, .12), transparent 60%),
+        radial-gradient(800px 480px at 85% 80%, rgba(55, 199, 178, .10), transparent 60%),
+        linear-gradient(160deg, #14161d 0%, #0b0d13 55%, #07080c 100%);
+      color: #e9ebf2;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      overflow: hidden;
+      user-select: none;
+    }
+    .intro {
+      position: fixed; left: 8vw; top: 50%; transform: translateY(-50%);
+      max-width: 380px; z-index: 1;
+    }
+    .intro .badge {
+      display: inline-block; font-size: 12px; letter-spacing: 2px;
+      color: #37c7b2; border: 1px solid rgba(55, 199, 178, .35);
+      background: rgba(55, 199, 178, .08);
+      padding: 4px 12px; border-radius: 999px; margin-bottom: 18px;
+    }
+    .intro h1 { font-size: 34px; font-weight: 700; letter-spacing: 1px; margin-bottom: 14px; }
+    .intro h1 span { color: #37c7b2; }
+    .intro p { font-size: 14px; line-height: 1.9; color: rgba(233, 235, 242, .62); }
+    .intro .tips { margin-top: 22px; font-size: 13px; line-height: 2.1; color: rgba(233, 235, 242, .5); }
+    .intro .tips b { color: rgba(233, 235, 242, .85); font-weight: 600; }
+    .intro a { color: #37c7b2; text-decoration: none; border-bottom: 1px solid rgba(55, 199, 178, .3); }
+    @media (max-width: 760px) {
+      .intro { left: 6vw; right: 6vw; top: 8vh; transform: none; max-width: none; }
+      .intro h1 { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="intro">
+    <div class="badge">BROWSER DEMO · 纯浏览器运行</div>
+    <h1>云抽烟 <span>Cloud Smoke</span></h1>
+    <p>
+      这是一个「解压玩具」风格的小组件：等 AI 跑结果的时候，点根烟打发时间。
+      点击香烟点燃，猛吸一口看烟雾飘散，弹弹烟灰，还能吐个烟圈。
+      纯虚拟体验，不鼓励真实吸烟 🚭
+    </p>
+    <div class="tips">
+      <b>玩法</b>：点香烟 = 点燃 / 掐灭　·　吸一口 = 点按轻吸、长按猛吸<br />
+      <b>主题</b>：打工人 / 熬夜赶稿 / Vibe Coding / 摸鱼解压 / 皇帝上朝 / 赛博夜猫子<br />
+      <b>源码</b>：<a href="https://github.com/your-github-username/cloud-smoke-widget" target="_blank" rel="noopener">github.com/…/cloud-smoke-widget</a>
+    </div>
+  </div>
+
+  <div id="demo-root"></div>
+
+  <script>
+    (function () {
+      // 本演示页与 DSH 内运行的组件是同一份源码：src/cloud-smoke-widget.js
+      // 这里用一个最小的 "DSH 环境假体" 提供 ctx / timer / styles，让插件在纯浏览器里直接跑起来。
+      var host = document.getElementById('demo-root');
+      var loadErr = document.createElement('div');
+      loadErr.style.cssText = 'position:fixed;left:50%;bottom:20px;transform:translateX(-50%);font-size:12px;color:#ff9a4d;z-index:9999;';
+
+      var styles = {
+        insert: function (css) {
+          var s = document.createElement('style');
+          s.textContent = css;
+          document.head.appendChild(s);
+        }
+      };
+
+      var timer = {
+        timeout: function (cb, ms) { var id = setTimeout(cb, ms); return function () { clearTimeout(id); }; },
+        interval: function (cb, ms) { var id = setInterval(cb, ms); return function () { clearInterval(id); }; }
+      };
+
+      var ctx = {
+        get: function (name) { return name === 'timer' ? timer : undefined; },
+        effect: function (fn) { return fn(); },
+        slots: {
+          register: function (def, Component) {
+            var injected = {};
+            if (typeof def.inject === 'function') injected = def.inject();
+            if (!injected || typeof injected.timer !== 'object') injected = { timer: timer };
+            ReactDOM.createRoot(host).render(
+              React.createElement(Component, injected)
+            );
+          }
+        }
+      };
+
+      function boot(code) {
+        var factory = new Function('ctx', 'React', 'styles', code);
+        var plugin = factory(ctx, React, styles);
+        plugin.apply(ctx);
+      }
+
+      // 通过 fetch 加载插件源码；本地直接双击打开会因 file:// 跨域失败，
+      // 请在仓库目录下用任意静态服务器打开，例如：npx serve . 或 python -m http.server
+      fetch('../src/cloud-smoke-widget.js')
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.text();
+        })
+        .then(function (code) { boot(code); })
+        .catch(function (err) {
+          loadErr.textContent = '无法加载插件源码（' + err.message + '）。请通过 HTTP 方式打开本页，例如在仓库根目录运行：npx serve';
+          document.body.appendChild(loadErr);
+        });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "name": "cloud-smoke-widget",
+  "version": "1.0.0",
+  "description": "云抽烟 · Cloud Smoke Widget —— 一个跑在 DeepSeek Desktop（DSH）浮层里的互动解压小组件：点燃、猛吸、弹烟灰、吐烟圈，六种主题氛围。",
+  "keywords": [
+    "deepseek",
+    "dsh",
+    "cordis",
+    "plugin",
+    "widget",
+    "smoke",
+    "fidget",
+    "解压",
+    "云抽烟"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-github-username/cloud-smoke-widget.git"
+  },
+  "files": [
+    "src",
+    "demo",
+    "preview"
+  ],
+  "scripts": {
+    "demo": "npx serve ."
+  }
+}
