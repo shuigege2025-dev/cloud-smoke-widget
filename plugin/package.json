@@ -1,0 +1,39 @@
+{
+  "name": "dsh-client-cloud-smoke-widget",
+  "version": "1.1.0",
+  "private": true,
+  "description": "云抽烟 · Cloud Smoke Widget —— 等待 AI 时的互动解压小组件：点燃/深吸/弹烟灰/吐烟圈 + 六主题氛围 + 原创合成音效（DeepSeek Harness 客户端插件）",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shuigege2025-dev/cloud-smoke-widget.git"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web"
+    }
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "cordis.patch.yml",
+    "assets/sounds/light.wav",
+    "assets/sounds/burn-loop.wav",
+    "assets/sounds/inhale.wav",
+    "assets/sounds/ash.wav",
+    "assets/sounds/exhale.wav",
+    "assets/sounds/switch.wav",
+    "assets/sounds/README.md",
+    "README.md"
+  ]
+}

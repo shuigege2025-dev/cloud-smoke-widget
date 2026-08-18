@@ -28,6 +28,7 @@
 ## ✨ 特性
 
 - 🔥 **点火 / 掐灭** — 点击香烟点燃，烟头出现火光、火星与脉动光晕
+- 🔊 **声音反馈** — 打火机点火 / 燃烧噼啪（循环）/ 吸气 / 弹灰 / 呼气 / 换烟，全部为程序化合成的原创音效（CC0），可一键静音
 - 💨 **吸烟 / 长按猛吸** — 点按轻吸一口；长按持续猛吸，香烟燃烧更快，烟雾从烟头缓缓飘出
 - 🫳 **弹烟灰** — 烟灰随燃烧积累，轻弹掉落在烟灰缸里，烟身还会微微抖动
 - ⭕ **吐烟圈** — 烟圈带不规则扰动边缘、内部半透明烟雾层、旋转扩散上升后自然消散
@@ -90,12 +91,52 @@
 
 > 备选方式：打开 [`src/cloud-smoke-widget.js`](src/cloud-smoke-widget.js) 手动复制全部代码发给 agent，让它「用 Cordis 把这段代码作为客户端插件运行」。
 
+## 📦 正式安装（静态插件 · 重启不丢）
+
+动态方式安装的插件在 DSH 重启后会消失。想要**永久内置**，使用仓库里的 [`plugin/`](plugin/) 静态插件包（含宿主半音效路由 + 客户端组件 + 音效资源）：
+
+```bash
+cd plugin
+npm pack   # 生成 dsh-client-cloud-smoke-widget-<版本>.tgz
+```
+
+把生成的 tgz 放到 `~/.dsh/`，然后在 `~/.dsh/profiles/desktop/package.json` 中加入：
+
+```json
+{
+  "dependencies": {
+    "dsh-client-cloud-smoke-widget": "file:C:/Users/<你>/.dsh/dsh-client-cloud-smoke-widget-1.1.0.tgz"
+  },
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-web-app",
+        "dsh-client-cloud-smoke-widget"
+      ]
+    }
+  }
+}
+```
+
+最后 `pnpm install` 并重启 DSH，小组件即永久出现在右下角浮层（无需批准）。音效由插件**宿主半**通过 `webServer` 精确路由提供：`/plugins/dsh-client-cloud-smoke-widget/assets/sounds/`。
+
 ## 📁 目录结构
 
 ```
 cloud-smoke-widget/
 ├── src/
-│   └── cloud-smoke-widget.js   # 插件源码（自包含：CSS + React 组件 + Cordis 注册）
+│   └── cloud-smoke-widget.js   # 单文件插件源码（动态安装用：CSS + React 组件 + Cordis 注册）
+├── plugin/                     # DSH 静态插件包（正式安装用）
+│   ├── lib/index.js            #   宿主半：webServer 音效路由
+│   ├── lib/client.js           #   客户端半：完整小组件（六主题 + 声音）
+│   ├── assets/sounds/          #   6 个程序化合成音效（WAV，CC0）
+│   ├── cordis.patch.yml        #   组合补丁（插入插件行）
+│   └── package.json
+├── tools/
+│   └── generate-sounds.cjs     # 音效合成器（重新生成 assets/sounds）
+├── assets/
+│   └── sounds/                 # 工作区音效源文件（与 plugin/assets/sounds 同源）
 ├── demo/
 │   └── index.html              # 纯浏览器演示页（同一份源码）
 ├── preview/
@@ -111,6 +152,8 @@ cloud-smoke-widget/
 - 依赖服务：`slots`（槽位注册）、`timer`（超时 / 循环定时器）；内置 `makeFallbackTimer()` 降级，脱离 DSH 也能跑（demo 页即利用这一点）
 - 烟雾 / 烟圈使用 SVG `feTurbulence` + `feDisplacementMap` 滤镜制造不规则扰动，配合 CSS 关键帧实现漂浮、旋转、扩散与消散
 - 燃烧状态机：`burnFront`（燃烧前沿）、`ashLen`（灰烬长度）与燃尽判定由 `timer` 循环驱动
+- 音效全部由 [`tools/generate-sounds.cjs`](tools/generate-sounds.cjs) **程序化合成**（白噪声 + Biquad 滤波 + 指数包络，44.1kHz WAV），无任何第三方采样，可自由商用
+- 静态插件版客户端经 `fetch` 拉取宿主半路由的 WAV → WebAudio `decodeAudioData` 播放；每次播放前强制 `resume()` 以规避 Windows 音频会话挂起导致的静音
 
 ## 🧭 关于 DeepSeek Harness（DSH）
 

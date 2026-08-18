@@ -1,0 +1,3 @@
+- insert:
+    - id: cloud-smoke-widget
+      name: dsh-client-cloud-smoke-widget

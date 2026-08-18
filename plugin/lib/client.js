@@ -1,3 +1,20 @@
+window.__ModuleLoader__.load({
+	id: "dsh-client-cloud-smoke-widget",
+	factory: (require) => {
+		var module = { exports: {} };
+		var exports = module.exports;
+		var react = require("react");
+		var styles = {
+			insert: function (css) {
+				if (document.querySelector('style[data-plugin="dsh-client-cloud-smoke-widget"]') !== null) return function () {};
+				var el = document.createElement("style");
+				el.dataset.plugin = "dsh-client-cloud-smoke-widget";
+				el.textContent = css;
+				document.head.appendChild(el);
+				return function () { el.remove(); };
+			}
+		};
+		var pluginFactory = function (ctx, React, styles) {
 const MAX_ASH = 169
 const CIG_W = 218
 const TIP_X = (268 - CIG_W) / 2 + CIG_W
@@ -5,6 +22,7 @@ const TIP_X = (268 - CIG_W) / 2 + CIG_W
 const RING_FILTER_A = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter%20id='fa'%20x='-30%25'%20y='-30%25'%20width='160%25'%20height='160%25'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.042%200.046'%20numOctaves='3'%20seed='7'%20result='n'/%3E%3CfeDisplacementMap%20in='SourceGraphic'%20in2='n'%20scale='26'%20xChannelSelector='R'%20yChannelSelector='G'/%3E%3C/filter%3E%3C/svg%3E#fa"
 const RING_FILTER_B = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter%20id='fb'%20x='-30%25'%20y='-30%25'%20width='160%25'%20height='160%25'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.055%200.032'%20numOctaves='2'%20seed='21'%20result='n'/%3E%3CfeDisplacementMap%20in='SourceGraphic'%20in2='n'%20scale='32'%20xChannelSelector='R'%20yChannelSelector='G'/%3E%3C/filter%3E%3C/svg%3E#fb"
 const SMOKE_FILTER = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter%20id='fs'%20x='-30%25'%20y='-30%25'%20width='160%25'%20height='160%25'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.015%200.02'%20numOctaves='2'%20seed='5'%20result='n'/%3E%3CfeDisplacementMap%20in='SourceGraphic'%20in2='n'%20scale='18'%20xChannelSelector='R'%20yChannelSelector='G'/%3E%3C/filter%3E%3C/svg%3E#fs"
+const SOUND_BASE = '/plugins/dsh-client-cloud-smoke-widget/assets/sounds/'
 
 const THEME_ORDER = ['worker', 'deadline', 'vibe', 'fish', 'emperor', 'cyber']
 const THEMES = {
@@ -350,24 +368,20 @@ function CloudSmokeWidget(props) {
     }
   }
 
-  const b64ToBuffer = (b64) => {
-    const bin = atob(b64)
-    const bytes = new Uint8Array(bin.length)
-    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
-    return bytes.buffer
-  }
-
   const getSoundBuffer = (name) => {
     const a = audioRef.current
     if (a.buffers[name]) return Promise.resolve(a.buffers[name])
     if (a.pending[name]) return a.pending[name]
     const ctx = ensureAudioCtx()
     if (!ctx) return Promise.resolve(null)
-    const p = host.call('get-sound', { name: name })
+    const p = fetch(SOUND_BASE + name + '.wav')
       .then((res) => {
-        const b64 = res && res.b64
-        if (!b64) return null
-        return ctx.decodeAudioData(b64ToBuffer(b64)).then((buf) => {
+        if (!res.ok) return null
+        return res.arrayBuffer()
+      })
+      .then((ab) => {
+        if (!ab) return null
+        return ctx.decodeAudioData(ab).then((buf) => {
           a.buffers[name] = buf
           return buf
         })
@@ -423,7 +437,7 @@ function CloudSmokeWidget(props) {
     if (!ctx) return
     const begin = () => {
       if (mutedRef.current || !litRef.current || a.burnSrc) return
-      startSource('burn', 0.06, true, (src, g) => {
+      startSource('burn-loop', 0.06, true, (src, g) => {
         if (litRef.current) {
           a.burnSrc = src
           a.burnGain = g
@@ -967,7 +981,7 @@ return {
   name: 'cloud-smoke-widget',
   inject: ['slots', 'timer'],
   apply(ctx) {
-    console.log('cloud-smoke-widget: registering shell.overlay entry (v7)')
+    console.log('cloud-smoke-widget: registering shell.overlay entry (v7-static)')
     const timer = ctx.get('timer')
     ctx.effect(() => styles.insert(CSS), 'cloud-smoke styles')
     ctx.slots.register({
@@ -979,3 +993,11 @@ return {
     }, CloudSmokeWidget)
   }
 }
+
+		};
+		var plugin = pluginFactory(undefined, react, styles);
+		exports.inject = plugin.inject;
+		exports.apply = plugin.apply;
+		return module.exports;
+	}
+});
