@@ -1,9 +1,29 @@
 # 云抽烟 ☁️🚬 Cloud Smoke Widget
 
-> 一个跑在 DeepSeek Desktop（DSH）浮层里的「云抽烟」解压小组件：等 AI 跑结果的时候，点根烟打发时间。
-> 纯虚拟体验，不鼓励真实吸烟 🚭
+> **DeepSeek Harness (DSH) 互动解压小组件 · Cordis 客户端插件 · 由 AI Agent 创建并开源**
+>
+> 等 AI 跑结果的时候，点根烟打发时间。纯虚拟体验，不鼓励真实吸烟 🚭
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Platform: DeepSeek Harness](https://img.shields.io/badge/platform-DeepSeek%20Harness%20(DSH)-4d6bfe)](https://github.com/shuigege2025-dev/cloud-smoke-widget)
+[![Type: Cordis Plugin](https://img.shields.io/badge/type-Cordis%20Client%20Plugin-37c7b2)](https://github.com/shuigege2025-dev/cloud-smoke-widget)
+[![Built by AI Agent](https://img.shields.io/badge/built%20by-AI%20Agent-ff9a4d)](https://github.com/shuigege2025-dev/cloud-smoke-widget)
 
 ![云抽烟效果演示](preview/cloud-smoking.gif)
+
+**English:** *An interactive virtual-smoking fidget widget for DeepSeek Harness (DSH) — a Cordis client plugin created and open-sourced by an AI agent. Light a cigarette, take a drag, flick the ash, blow smoke rings, and switch between 6 ambient themes while you wait for your AI to finish.*
+
+---
+
+## 🤔 这是什么？
+
+**Cloud Smoke Widget（云抽烟小组件）** 是一个运行在 **DeepSeek Harness（简称 DSH）** 聊天浮层里的互动解压玩具。它不是一个真实吸烟应用，而是一个「等待 AI 工作时的指尖玩具」：
+
+- 你正在 **Vibe Coding**、让 AI 写代码 / 赶稿 / 查资料
+- 等待结果时，点根虚拟香烟、吐个烟圈、弹弹烟灰
+- 六种主题氛围，从打工人到皇帝上朝，随心切换
+
+这个项目本身也是 **由 AI Agent 在 DSH 内创建并开源** 的 —— 从产品想法到全部代码都由 Agent 完成，是一个完整的 **DSH / Cordis Agent 插件** 开发案例。
 
 ## ✨ 特性
 
@@ -43,7 +63,7 @@
 
 ## 🔌 在 DSH 中一键安装
 
-本插件是一个 **DSH Cordis 客户端插件**，注册在 `shell.overlay` 浮层槽位，需要 DSH 提供 `ctx` / `React` / `styles` 内建与 `slots` / `timer` 服务。
+本插件是一个 **DSH Cordis 客户端插件（Cordis Client Plugin）**，注册在 `shell.overlay` 浮层槽位，需要 DSH 提供 `ctx` / `React` / `styles` 内建与 `slots` / `timer` 服务。
 
 **复制下面这条消息发给任意 DSH 会话即可：**
 
@@ -86,11 +106,31 @@ cloud-smoke-widget/
 
 ## 🛠️ 技术说明
 
-- 单文件、零依赖的 Cordis 客户端插件：所有样式与逻辑内联在一个文件里
+- 单文件、零依赖的 **Cordis 客户端插件**：所有样式与逻辑内联在一个文件里
 - 通过 `ctx.slots.register({ name: 'shell.overlay', ... })` 挂载到 DSH 浮层
 - 依赖服务：`slots`（槽位注册）、`timer`（超时 / 循环定时器）；内置 `makeFallbackTimer()` 降级，脱离 DSH 也能跑（demo 页即利用这一点）
 - 烟雾 / 烟圈使用 SVG `feTurbulence` + `feDisplacementMap` 滤镜制造不规则扰动，配合 CSS 关键帧实现漂浮、旋转、扩散与消散
 - 燃烧状态机：`burnFront`（燃烧前沿）、`ashLen`（灰烬长度）与燃尽判定由 `timer` 循环驱动
+
+## 🧭 关于 DeepSeek Harness（DSH）
+
+DeepSeek Harness（DSH）是 DeepSeek 的 Agent 运行环境，支持通过 **Cordis 插件系统** 扩展客户端 UI。本仓库是一个最小可复制的 **DSH Agent 插件** 案例：从「注册 `shell.overlay` 槽位」到「用 `ctx` 获取服务」，覆盖了开发一个 Cordis 客户端插件所需的核心知识。如果你也在为 DSH 开发插件，欢迎参考或 Fork。
+
+## 🌍 English Quick Start
+
+- **What:** an interactive fidget widget for DeepSeek Harness (DSH), built as a Cordis client plugin
+- **Try it:** open [`demo/index.html`](demo/index.html) in any static server, no DSH required
+- **Install:** paste this one-liner to any DSH chat:
+
+```text
+Install this DSH plugin for me: https://github.com/shuigege2025-dev/cloud-smoke-widget
+```
+
+- **License:** MIT
+
+## ⭐ 支持项目
+
+如果这个小玩具帮你熬过了等 AI 的时间，点个 **Star** 支持一下 ⭐；也欢迎提 Issue 或 PR。
 
 ## 📜 License
 
