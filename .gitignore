@@ -3,6 +3,9 @@ node_modules/
 .tools/
 *.tgz
 
+# 本地素材源文件（已复制到 preview/ 使用）
+GitHub演示.gif
+
 # 系统与编辑器
 .DS_Store
 Thumbs.db
