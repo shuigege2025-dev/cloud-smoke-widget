@@ -63,7 +63,7 @@
 
 ## 🔌 在 DSH 中一键安装
 
-本插件是一个 **DSH Cordis 客户端插件（Cordis Client Plugin）**，注册在 `shell.overlay` 浮层槽位，需要 DSH 提供 `ctx` / `React` / `styles` 内建与 `slots` / `timer` 服务。
+本插件是一个 **DSH Cordis 客户端插件（Cordis Client Plugin / Agent Plugin）**，注册在 `shell.overlay` 浮层槽位，需要 DSH 提供 `ctx` / `React` / `styles` 内建与 `slots` / `timer` 服务。
 
 **复制下面这条消息发给任意 DSH 会话即可：**
 
@@ -118,7 +118,7 @@ DeepSeek Harness（DSH）是 DeepSeek 的 Agent 运行环境，支持通过 **Co
 
 ## 🌍 English Quick Start
 
-- **What:** an interactive fidget widget for DeepSeek Harness (DSH), built as a Cordis client plugin
+- **What:** an interactive fidget widget for DeepSeek Harness (DSH), built as a Cordis client plugin (AI Agent Plugin)
 - **Try it:** open [`demo/index.html`](demo/index.html) in any static server, no DSH required
 - **Install:** paste this one-liner to any DSH chat:
 
