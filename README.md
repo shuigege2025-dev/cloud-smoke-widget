@@ -64,23 +64,34 @@
 > python -m http.server
 > ```
 
-## 🔌 在 DSH 中一键安装
+## 🔌 在 DSH 中一键安装（永久生效）
 
 本插件是一个 **DSH Cordis 客户端插件（Cordis Client Plugin / Agent Plugin）**，注册在 `shell.overlay` 浮层槽位，需要 DSH 提供 `ctx` / `React` / `styles` 内建与 `slots` / `timer` 服务。
 
-**复制下面这条消息发给任意 DSH 会话即可：**
+**复制下面这条消息发给任意 DSH 会话即可完成永久安装**（Agent 会替你把静态插件包装进 DSH Profile，**重启后依然生效**）：
 
 ```text
-帮我安装这个 DSH 插件：https://github.com/shuigege2025-dev/cloud-smoke-widget
+帮我安装这个 DSH 插件到我的 DSH，要永久生效（重启后仍在）：
+https://github.com/shuigege2025-dev/cloud-smoke-widget
+
+请按仓库 README 的「📦 正式安装」流程操作：
+1. 克隆仓库，进入 plugin/ 目录执行 npm pack，得到 dsh-client-cloud-smoke-widget-<版本>.tgz
+2. 把 tgz 复制到 ~/.dsh/，并更新 ~/.dsh/profiles/desktop/package.json：
+   - dependencies 增加 "dsh-client-cloud-smoke-widget": "file:C:/Users/<用户名>/.dsh/<tgz 文件名>"
+   - dsh.profile.bundles 增加 "dsh-client-cloud-smoke-widget"
+3. 在 ~/.dsh/profiles/desktop 目录执行 pnpm install
+4. 完成后提醒我重启 DSH；重启后右下角浮层即出现小组件（含声音）
 ```
 
-安装成功后，小组件会出现在 DSH 界面的右下角浮层。
+安装成功后，小组件会出现在 DSH 界面的右下角浮层；音效由插件宿主半自动提供，无需额外配置。
 
 <details>
-<summary>详细版提示词（短版装不上时用）</summary>
+<summary>临时体验方式（重启后消失，仅用于快速预览）</summary>
+
+> ⚠️ 注意：下面的动态方式只存在于当前 DSH 进程，**重启后插件与授权都会消失**，适合快速试玩；长期使用请用上面的永久安装。
 
 ```text
-帮我安装这个仓库的 DSH 插件到我的 DSH：https://github.com/shuigege2025-dev/cloud-smoke-widget
+帮我临时预览这个 DSH 插件：https://github.com/shuigege2025-dev/cloud-smoke-widget
 
 安装步骤：
 1. 下载插件源码的完整内容：https://raw.githubusercontent.com/shuigege2025-dev/cloud-smoke-widget/main/src/cloud-smoke-widget.js
@@ -91,9 +102,9 @@
 
 </details>
 
-> 备选方式：打开 [`src/cloud-smoke-widget.js`](src/cloud-smoke-widget.js) 手动复制全部代码发给 agent，让它「用 Cordis 把这段代码作为客户端插件运行」。
-
 ## 📦 正式安装（静态插件 · 重启不丢）
+
+> 💡 不想手动操作？把上面「一键安装」的提示词发给任意 DSH 会话，Agent 会按下面这套流程自动完成全部步骤。
 
 动态方式安装的插件在 DSH 重启后会消失。想要**永久内置**，使用仓库里的 [`plugin/`](plugin/) 静态插件包（含宿主半音效路由 + 客户端组件 + 音效资源）：
 
@@ -165,10 +176,12 @@ DeepSeek Harness（DSH）是 DeepSeek 的 Agent 运行环境，支持通过 **Co
 
 - **What:** an interactive fidget widget for DeepSeek Harness (DSH), built as a Cordis client plugin (AI Agent Plugin)
 - **Try it online:** open <https://shuigege2025-dev.github.io/cloud-smoke-widget/demo/> — no DSH required; or serve [`demo/index.html`](demo/index.html) locally with any static server
-- **Install:** paste this one-liner to any DSH chat:
+- **Install:** paste this one-liner to any DSH chat (permanent — survives restart):
 
 ```text
-Install this DSH plugin for me: https://github.com/shuigege2025-dev/cloud-smoke-widget
+Install this DSH plugin for me permanently (must survive restart):
+https://github.com/shuigege2025-dev/cloud-smoke-widget
+Follow the "📦 正式安装" steps in its README (npm pack under plugin/, add the tgz to ~/.dsh/profiles/desktop/package.json, pnpm install, then remind me to restart DSH).
 ```
 
 - **License:** MIT
