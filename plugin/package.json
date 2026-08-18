@@ -1,6 +1,6 @@
 {
   "name": "dsh-client-cloud-smoke-widget",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "private": true,
   "description": "云抽烟 · Cloud Smoke Widget —— 等待 AI 时的互动解压小组件：点燃/深吸/弹烟灰/吐烟圈 + 六主题氛围 + 原创合成音效 + 派烟分享 + 检查更新（DeepSeek Harness 客户端插件）",
   "type": "module",

@@ -23,11 +23,16 @@ const RING_FILTER_A = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://w
 const RING_FILTER_B = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter%20id='fb'%20x='-30%25'%20y='-30%25'%20width='160%25'%20height='160%25'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.055%200.032'%20numOctaves='2'%20seed='21'%20result='n'/%3E%3CfeDisplacementMap%20in='SourceGraphic'%20in2='n'%20scale='32'%20xChannelSelector='R'%20yChannelSelector='G'/%3E%3C/filter%3E%3C/svg%3E#fb"
 const SMOKE_FILTER = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter%20id='fs'%20x='-30%25'%20y='-30%25'%20width='160%25'%20height='160%25'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.015%200.02'%20numOctaves='2'%20seed='5'%20result='n'/%3E%3CfeDisplacementMap%20in='SourceGraphic'%20in2='n'%20scale='18'%20xChannelSelector='R'%20yChannelSelector='G'/%3E%3C/filter%3E%3C/svg%3E#fs"
 const SOUND_BASE = '/plugins/dsh-client-cloud-smoke-widget/assets/sounds/'
-const VERSION = '1.2.1'
+const VERSION = '1.2.2'
 const REPO_URL = 'https://github.com/shuigege2025-dev/cloud-smoke-widget'
 const UPDATE_URLS = [
   '/plugins/dsh-client-cloud-smoke-widget/latest-version',
   'https://raw.githubusercontent.com/shuigege2025-dev/cloud-smoke-widget/main/plugin/package.json'
+]
+const SOUND_ASSET_URLS = [
+  '/plugins/dsh-client-cloud-smoke-widget/assets/sounds/',
+  '../assets/sounds/',
+  'https://shuigege2025-dev.github.io/cloud-smoke-widget/assets/sounds/'
 ]
 const INVITE_TEXT = '🚬 来一起云抽烟！等 AI 跑结果的时候，点根虚拟香烟解解压——六种主题氛围、真实烟雾烟圈、原创音效。\n\n一键安装：把下面这条消息发给任意 DSH 会话👇\n帮我安装这个 DSH 插件：' + REPO_URL + '\n\n装完右下角浮层就能玩。觉得不错的话，去仓库点个 Star ⭐ 支持一下～'
 
@@ -68,6 +73,19 @@ const THEMES = {
   fish: { name: '摸鱼解压', icon: '🐟', cls: 't-fish', idle: '还没开始', lit: '摸鱼中 %p%', done: '摸完收工', hint: '点击香烟点燃 · 摸会儿鱼不着急', bLight: '开摸', bSnuff: '收工', bInhale: '偷一口', bFlick: '弹弹灰', bRing: '吐个泡', bReset: '换一根' },
   emperor: { name: '皇帝上朝', icon: '👑', cls: 't-emperor', idle: '未上朝', lit: '批阅中 %p%', done: '今日已阅', hint: '点击香烟点燃 · 批阅奏折提提神', bLight: '起驾', bSnuff: '退朝', bInhale: '龙吸一口', bFlick: '弹烟灰', bRing: '吐烟圈', bReset: '换一根' },
   cyber: { name: '赛博夜猫子', icon: '🤖', cls: 't-cyber', idle: '系统待机', lit: '超频运行 %p%', done: '任务完成', hint: '点击香烟点燃 · 霓虹夜还未眠', bLight: '通电', bSnuff: '断连', bInhale: '数据吸入', bFlick: '排灰', bRing: '吐个环', bReset: '重置一根' }
+}
+
+function fetchSoundAsset(urls) {
+  const win = (typeof window !== 'undefined' && window) || null
+  if (!win || typeof win.fetch !== 'function') return Promise.resolve(null)
+  const tryUrl = (i) => {
+    if (i >= urls.length) return Promise.resolve(null)
+    return win.fetch(urls[i], { cache: 'no-store' })
+      .then((res) => (res.ok ? res.arrayBuffer() : null))
+      .then((ab) => (ab && ab.byteLength > 0 ? ab : tryUrl(i + 1)))
+      .catch(() => tryUrl(i + 1))
+  }
+  return tryUrl(0)
 }
 
 const CSS = `
@@ -488,17 +506,24 @@ function CloudSmokeWidget(props) {
     if (a.pending[name]) return a.pending[name]
     const ctx = ensureAudioCtx()
     if (!ctx) return Promise.resolve(null)
-    const p = fetch(SOUND_BASE + name + '.wav')
-      .then((res) => {
-        if (!res.ok) return null
-        return res.arrayBuffer()
+    const useHost = typeof host !== 'undefined' && host !== null && typeof host.call === 'function'
+    let p
+    if (useHost) {
+      p = host.call('get-sound', { name: name }).then((res) => {
+        const b64 = res && res.b64
+        if (!b64) return null
+        return ctx.decodeAudioData(b64ToBuffer(b64))
       })
-      .then((ab) => {
+    } else {
+      p = fetchSoundAsset(SOUND_ASSET_URLS.map((u) => u + name + '.wav')).then((ab) => {
         if (!ab) return null
-        return ctx.decodeAudioData(ab).then((buf) => {
-          a.buffers[name] = buf
-          return buf
-        })
+        return ctx.decodeAudioData(ab)
+      })
+    }
+    p = p
+      .then((buf) => {
+        if (buf) a.buffers[name] = buf
+        return buf
       })
       .catch(() => null)
       .then((buf) => {

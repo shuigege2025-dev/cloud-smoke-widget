@@ -1,11 +1,15 @@
 const MAX_ASH = 169
 const CIG_W = 218
 const TIP_X = (268 - CIG_W) / 2 + CIG_W
-const VERSION = '1.2.1'
+const VERSION = '1.2.2'
 const REPO_URL = 'https://github.com/shuigege2025-dev/cloud-smoke-widget'
 const UPDATE_URLS = [
   '/plugins/dsh-client-cloud-smoke-widget/latest-version',
   'https://raw.githubusercontent.com/shuigege2025-dev/cloud-smoke-widget/main/plugin/package.json'
+]
+const SOUND_ASSET_URLS = [
+  '../assets/sounds/',
+  'https://shuigege2025-dev.github.io/cloud-smoke-widget/assets/sounds/'
 ]
 const INVITE_TEXT = '🚬 来一起云抽烟！等 AI 跑结果的时候，点根虚拟香烟解解压——六种主题氛围、真实烟雾烟圈、原创音效。\n\n一键安装：把下面这条消息发给任意 DSH 会话👇\n帮我安装这个 DSH 插件：' + REPO_URL + '\n\n装完右下角浮层就能玩。觉得不错的话，去仓库点个 Star ⭐ 支持一下～'
 
@@ -48,6 +52,19 @@ function fetchUpdateVersion() {
         })
       })
       .catch(() => tryUrl(index + 1))
+  }
+  return tryUrl(0)
+}
+
+function fetchSoundAsset(urls) {
+  const win = (typeof window !== 'undefined' && window) || null
+  if (!win || typeof win.fetch !== 'function') return Promise.resolve(null)
+  const tryUrl = (i) => {
+    if (i >= urls.length) return Promise.resolve(null)
+    return win.fetch(urls[i], { cache: 'no-store' })
+      .then((res) => (res.ok ? res.arrayBuffer() : null))
+      .then((ab) => (ab && ab.byteLength > 0 ? ab : tryUrl(i + 1)))
+      .catch(() => tryUrl(i + 1))
   }
   return tryUrl(0)
 }
@@ -477,14 +494,24 @@ function CloudSmokeWidget(props) {
     if (a.pending[name]) return a.pending[name]
     const ctx = ensureAudioCtx()
     if (!ctx) return Promise.resolve(null)
-    const p = host.call('get-sound', { name: name })
-      .then((res) => {
+    const useHost = typeof host !== 'undefined' && host !== null && typeof host.call === 'function'
+    let p
+    if (useHost) {
+      p = host.call('get-sound', { name: name }).then((res) => {
         const b64 = res && res.b64
         if (!b64) return null
-        return ctx.decodeAudioData(b64ToBuffer(b64)).then((buf) => {
-          a.buffers[name] = buf
-          return buf
-        })
+        return ctx.decodeAudioData(b64ToBuffer(b64))
+      })
+    } else {
+      p = fetchSoundAsset(SOUND_ASSET_URLS.map((u) => u + name + '.wav')).then((ab) => {
+        if (!ab) return null
+        return ctx.decodeAudioData(ab)
+      })
+    }
+    p = p
+      .then((buf) => {
+        if (buf) a.buffers[name] = buf
+        return buf
       })
       .catch(() => null)
       .then((buf) => {
