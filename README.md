@@ -64,31 +64,31 @@
 > python -m http.server
 > ```
 
-## 🔌 在 DSH 中一键安装（永久生效）
+## 🔌 一键安装（推荐 · 永久生效）
 
-本插件是一个 **DSH Cordis 客户端插件（Cordis Client Plugin / Agent Plugin）**，注册在 `shell.overlay` 浮层槽位，需要 DSH 提供 `ctx` / `React` / `styles` 内建与 `slots` / `timer` 服务。
-
-**复制下面这条消息发给任意 DSH 会话即可完成永久安装**（Agent 会替你把静态插件包装进 DSH Profile，**重启后依然生效**）：
+**把这句话发给任意 DSH 会话就行：**
 
 ```text
-帮我安装这个 DSH 插件到我的 DSH，要永久生效（重启后仍在）：
-https://github.com/shuigege2025-dev/cloud-smoke-widget
-
-请按仓库 README 的「📦 正式安装」流程操作：
-1. 克隆仓库，进入 plugin/ 目录执行 npm pack，得到 dsh-client-cloud-smoke-widget-<版本>.tgz
-2. 把 tgz 复制到 ~/.dsh/，并更新 ~/.dsh/profiles/desktop/package.json：
-   - dependencies 增加 "dsh-client-cloud-smoke-widget": "file:C:/Users/<用户名>/.dsh/<tgz 文件名>"
-   - dsh.profile.bundles 增加 "dsh-client-cloud-smoke-widget"
-3. 在 ~/.dsh/profiles/desktop 目录执行 pnpm install
-4. 完成后提醒我重启 DSH；重启后右下角浮层即出现小组件（含声音）
+帮我永久安装这个 DSH 插件（重启后也要还在）：https://github.com/shuigege2025-dev/cloud-smoke-widget
 ```
 
-安装成功后，小组件会出现在 DSH 界面的右下角浮层；音效由插件宿主半自动提供，无需额外配置。
+Agent 会自动完成打包、写入 DSH Profile 和依赖安装，装完会提醒你**重启 DSH**。重启后右下角浮层即出现小组件（含声音），之后一直可用，无需再操作。
 
 <details>
-<summary>临时体验方式（重启后消失，仅用于快速预览）</summary>
+<summary>这句话没装好？试试补充指令</summary>
 
-> ⚠️ 注意：下面的动态方式只存在于当前 DSH 进程，**重启后插件与授权都会消失**，适合快速试玩；长期使用请用上面的永久安装。
+```text
+请按仓库 README 的「📦 正式安装」一节操作：
+plugin/ 目录 npm pack 生成 tgz → 把 tgz 加入 ~/.dsh/profiles/desktop/package.json
+的 dependencies 和 dsh.profile.bundles → 在该目录 pnpm install → 完成后提醒我重启 DSH。
+```
+
+</details>
+
+<details>
+<summary>临时预览（重启会消失，一般不推荐）</summary>
+
+> ⚠️ 下面的方式只存在于当前 DSH 进程，**重启后插件与授权都会消失**，仅适合快速试玩。
 
 ```text
 帮我临时预览这个 DSH 插件：https://github.com/shuigege2025-dev/cloud-smoke-widget
@@ -102,11 +102,14 @@ https://github.com/shuigege2025-dev/cloud-smoke-widget
 
 </details>
 
-## 📦 正式安装（静态插件 · 重启不丢）
+## 📦 正式安装（手动 · 技术用户参考）
 
-> 💡 不想手动操作？把上面「一键安装」的提示词发给任意 DSH 会话，Agent 会按下面这套流程自动完成全部步骤。
+> 普通用户**不需要看这一节**，用上面的「一键安装」即可。仅当你想手动操作、排查问题或二次开发时才需要下面的细节。
 
-动态方式安装的插件在 DSH 重启后会消失。想要**永久内置**，使用仓库里的 [`plugin/`](plugin/) 静态插件包（含宿主半音效路由 + 客户端组件 + 音效资源）：
+<details>
+<summary>展开手动安装步骤</summary>
+
+静态插件包在 [`plugin/`](plugin/) 目录（含宿主半音效路由 + 客户端组件 + 音效资源）。安装步骤：
 
 ```bash
 cd plugin
@@ -118,7 +121,7 @@ npm pack   # 生成 dsh-client-cloud-smoke-widget-<版本>.tgz
 ```json
 {
   "dependencies": {
-    "dsh-client-cloud-smoke-widget": "file:C:/Users/<你>/.dsh/dsh-client-cloud-smoke-widget-1.1.0.tgz"
+    "dsh-client-cloud-smoke-widget": "file:C:/Users/<你>/.dsh/dsh-client-cloud-smoke-widget-1.2.2.tgz"
   },
   "dsh": {
     "profile": {
@@ -133,6 +136,8 @@ npm pack   # 生成 dsh-client-cloud-smoke-widget-<版本>.tgz
 ```
 
 最后 `pnpm install` 并重启 DSH，小组件即永久出现在右下角浮层（无需批准）。音效由插件**宿主半**通过 `webServer` 精确路由提供：`/plugins/dsh-client-cloud-smoke-widget/assets/sounds/`。
+
+</details>
 
 ## 📁 目录结构
 
@@ -181,7 +186,6 @@ DeepSeek Harness（DSH）是 DeepSeek 的 Agent 运行环境，支持通过 **Co
 ```text
 Install this DSH plugin for me permanently (must survive restart):
 https://github.com/shuigege2025-dev/cloud-smoke-widget
-Follow the "📦 正式安装" steps in its README (npm pack under plugin/, add the tgz to ~/.dsh/profiles/desktop/package.json, pnpm install, then remind me to restart DSH).
 ```
 
 - **License:** MIT
