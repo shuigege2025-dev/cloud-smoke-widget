@@ -52,17 +52,17 @@
 
 ## 🎮 快速体验（无需安装）
 
-打开 [`demo/index.html`](demo/index.html) 即可在浏览器里直接玩（与 DSH 内运行的是同一份源码）。
+**直接打开在线演示页就能玩**（与 DSH 内运行的是同一份源码，无需安装任何东西）：
 
-> 由于浏览器跨域限制，`file://` 直接双击打开会加载失败，请用任意静态服务器打开：
+👉 **https://shuigege2025-dev.github.io/cloud-smoke-widget/demo/**
+
+> 想本地跑的话，克隆仓库后用任意静态服务器打开 `demo/index.html` 也可以（由于浏览器跨域限制，`file://` 直接双击打开会加载失败）：
 >
 > ```bash
 > npx serve .        # 然后访问 http://localhost:3000/demo/
 > # 或
 > python -m http.server
 > ```
->
-> 如果在仓库 Settings → Pages 启用了 GitHub Pages（选择 `main` 分支），也可以直接在线玩：`https://shuigege2025-dev.github.io/cloud-smoke-widget/demo/`
 
 ## 🔌 在 DSH 中一键安装
 
@@ -164,7 +164,7 @@ DeepSeek Harness（DSH）是 DeepSeek 的 Agent 运行环境，支持通过 **Co
 ## 🌍 English Quick Start
 
 - **What:** an interactive fidget widget for DeepSeek Harness (DSH), built as a Cordis client plugin (AI Agent Plugin)
-- **Try it:** open [`demo/index.html`](demo/index.html) in any static server, no DSH required
+- **Try it online:** open <https://shuigege2025-dev.github.io/cloud-smoke-widget/demo/> — no DSH required; or serve [`demo/index.html`](demo/index.html) locally with any static server
 - **Install:** paste this one-liner to any DSH chat:
 
 ```text
