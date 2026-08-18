@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url'
 const PACKAGE_ID = 'dsh-client-cloud-smoke-widget'
 const SOUND_PREFIX = `/plugins/${PACKAGE_ID}/assets/sounds/`
 const SOUND_FILES = ['light.wav', 'burn-loop.wav', 'inhale.wav', 'ash.wav', 'exhale.wav', 'switch.wav']
+const VERSION_URL = 'https://raw.githubusercontent.com/shuigege2025-dev/cloud-smoke-widget/main/plugin/package.json'
 
 function send(res, status, headers = {}) {
   res.writeHead(status, { 'X-Content-Type-Options': 'nosniff', ...headers })
@@ -38,6 +39,34 @@ export function apply(ctx) {
 
   ctx.effect(() => {
     const unregister = []
+    unregister.push(ctx.webServer.register({
+      kind: 'exact',
+      path: `/plugins/${PACKAGE_ID}/latest-version`,
+      handler: async (req, res) => {
+        const method = req.method ?? 'GET'
+        if (method !== 'GET' && method !== 'HEAD') {
+          send(res, 405, { Allow: 'GET, HEAD' })
+          return
+        }
+        try {
+          const controller = typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
+          const response = await fetch(VERSION_URL, { cache: 'no-store', signal: controller })
+          if (!response.ok) {
+            send(res, 502)
+            return
+          }
+          const text = await response.text()
+          if (method === 'HEAD') {
+            send(res, 200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' })
+            return
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' })
+          res.end(text)
+        } catch (err) {
+          send(res, 502)
+        }
+      }
+    }))
     for (const [path, asset] of store) {
       unregister.push(ctx.webServer.register({
         kind: 'exact',

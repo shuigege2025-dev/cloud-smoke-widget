@@ -23,6 +23,42 @@ const RING_FILTER_A = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://w
 const RING_FILTER_B = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter%20id='fb'%20x='-30%25'%20y='-30%25'%20width='160%25'%20height='160%25'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.055%200.032'%20numOctaves='2'%20seed='21'%20result='n'/%3E%3CfeDisplacementMap%20in='SourceGraphic'%20in2='n'%20scale='32'%20xChannelSelector='R'%20yChannelSelector='G'/%3E%3C/filter%3E%3C/svg%3E#fb"
 const SMOKE_FILTER = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter%20id='fs'%20x='-30%25'%20y='-30%25'%20width='160%25'%20height='160%25'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.015%200.02'%20numOctaves='2'%20seed='5'%20result='n'/%3E%3CfeDisplacementMap%20in='SourceGraphic'%20in2='n'%20scale='18'%20xChannelSelector='R'%20yChannelSelector='G'/%3E%3C/filter%3E%3C/svg%3E#fs"
 const SOUND_BASE = '/plugins/dsh-client-cloud-smoke-widget/assets/sounds/'
+const VERSION = '1.2.0'
+const REPO_URL = 'https://github.com/shuigege2025-dev/cloud-smoke-widget'
+const UPDATE_URLS = [
+  '/plugins/dsh-client-cloud-smoke-widget/latest-version',
+  'https://raw.githubusercontent.com/shuigege2025-dev/cloud-smoke-widget/main/plugin/package.json'
+]
+const INVITE_TEXT = '🚬 来一起云抽烟！等 AI 跑结果的时候，点根虚拟香烟解解压——六种主题氛围、真实烟雾烟圈、原创音效。\n\n一键安装：把下面这条消息发给任意 DSH 会话👇\n帮我安装这个 DSH 插件：' + REPO_URL + '\n\n装完右下角浮层就能玩。觉得不错的话，去仓库点个 Star ⭐ 支持一下～'
+
+function compareVersions(a, b) {
+  const pa = String(a).split('.').map(Number)
+  const pb = String(b).split('.').map(Number)
+  for (let i = 0; i < 3; i++) {
+    const x = pa[i] || 0
+    const y = pb[i] || 0
+    if (x !== y) return x > y ? 1 : -1
+  }
+  return 0
+}
+
+function fetchUpdateVersion() {
+  const win = (typeof window !== 'undefined' && window) || null
+  if (!win || typeof win.fetch !== 'function') return Promise.resolve(null)
+  const tryUrl = (index) => {
+    if (index >= UPDATE_URLS.length) return Promise.resolve(null)
+    return win.fetch(UPDATE_URLS[index], { cache: 'no-store' })
+      .then((res) => {
+        if (!res.ok) return tryUrl(index + 1)
+        return res.json().then((data) => {
+          if (data && typeof data.version === 'string') return data.version
+          return tryUrl(index + 1)
+        })
+      })
+      .catch(() => tryUrl(index + 1))
+  }
+  return tryUrl(0)
+}
 
 const THEME_ORDER = ['worker', 'deadline', 'vibe', 'fish', 'emperor', 'cyber']
 const THEMES = {
@@ -194,6 +230,33 @@ const CSS = `
 .ycs-btn-reset { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.85); }
 .ycs-btn-reset:hover { background: rgba(255,255,255,.12); }
 .ycs-foot { padding: 0 14px 11px; text-align: center; font-size: 10px; letter-spacing: .3px; color: rgba(255,255,255,.34); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; z-index: 1; }
+.ycs-panel { position: absolute; inset: 0; z-index: 6; display: flex; flex-direction: column; gap: 10px; padding: 14px; background: linear-gradient(165deg, rgba(26,29,39,.98), rgba(10,12,18,.99)); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 20px; animation: ycs-panel-in .22s ease; overflow-y: auto; }
+@keyframes ycs-panel-in { from { opacity: 0; transform: scale(.93) translateY(6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.ycs-panel-head { display: flex; align-items: center; gap: 8px; }
+.ycs-panel-title { flex: 1; font-size: 12.5px; font-weight: 700; letter-spacing: .3px; color: rgba(255,255,255,.95); }
+.ycs-panel-hero { text-align: center; padding: 2px 0; }
+.ycs-hero-emoji { font-size: 26px; line-height: 1.2; }
+.ycs-hero-line1 { margin-top: 2px; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; background: linear-gradient(90deg, var(--ycs-btnl-a), var(--ycs-btnr-a)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.ycs-hero-line2 { margin-top: 3px; font-size: 10.5px; color: rgba(255,255,255,.5); letter-spacing: .5px; }
+.ycs-repo { padding: 8px 10px; background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.1); border-radius: 10px; font-family: Consolas, 'Courier New', monospace; font-size: 10px; color: rgba(170,215,255,.85); word-break: break-all; line-height: 1.5; user-select: text; -webkit-user-select: text; }
+.ycs-panel-row { display: flex; gap: 8px; }
+.ycs-panel-btn { flex: 1; height: 33px; border-radius: 10px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.07); color: #f0f2f8; font-size: 11.5px; font-weight: 600; letter-spacing: .3px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: transform .12s ease, filter .15s ease, background .15s ease; }
+.ycs-panel-btn:hover { background: rgba(255,255,255,.14); transform: translateY(-1px); }
+.ycs-panel-btn:active { transform: scale(.96); }
+.ycs-panel-btn.primary { background: linear-gradient(160deg, var(--ycs-btnl-a), var(--ycs-btnl-b)); border-color: transparent; box-shadow: 0 4px 14px color-mix(in srgb, var(--ycs-btnl-a) 35%, transparent); }
+.ycs-panel-btn.open { background: linear-gradient(160deg, var(--ycs-btni-a), var(--ycs-btni-b)); border-color: transparent; box-shadow: 0 4px 14px color-mix(in srgb, var(--ycs-btni-a) 35%, transparent); }
+.ycs-panel-star { text-align: center; font-size: 10.5px; line-height: 1.7; color: rgba(255,255,255,.55); }
+.ycs-star { cursor: pointer; font-size: 14px; filter: drop-shadow(0 2px 6px rgba(255,200,90,.5)); transition: transform .15s ease; display: inline-block; }
+.ycs-star:hover { transform: scale(1.25) rotate(8deg); }
+.ycs-divider { height: 1px; background: rgba(255,255,255,.09); }
+.ycs-panel-upd { display: flex; flex-direction: column; gap: 8px; }
+.ycs-upd-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: rgba(255,255,255,.6); flex-wrap: wrap; }
+.ycs-upd-new { color: #ffb45e; font-weight: 700; }
+.ycs-upd-ok { color: #57d9a3; }
+.ycs-upd-err { color: #e58a8a; }
+.ycs-upd-txt { color: rgba(255,255,255,.45); }
+.ycs-ghost.badge { color: #ffd77a; animation: ycs-badge-pulse 2s ease-in-out infinite; }
+@keyframes ycs-badge-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
 .ycs-sc-worker .ycs-blinds { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(210,220,255,.05) 0 9px, rgba(0,0,10,.16) 9px 20px); }
 .ycs-sc-worker .ycs-officelight { position: absolute; top: -60px; right: -40px; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(closest-side, rgba(170,195,255,.28), rgba(170,195,255,0) 70%); }
 .ycs-sc-worker .ycs-desklamp { position: absolute; bottom: -30px; left: -30px; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,214,150,.16), rgba(255,214,150,0) 70%); }
@@ -307,6 +370,8 @@ function CloudSmokeWidget(props) {
   const [muted, setMuted] = React.useState(false)
   const [collapsed, setCollapsed] = React.useState(false)
   const [offset, setOffset] = React.useState({ x: 0, y: 0 })
+  const [panelOpen, setPanelOpen] = React.useState(false)
+  const [update, setUpdate] = React.useState({ status: 'idle', version: null })
 
   const seqRef = React.useRef(0)
   const litRef = React.useRef(false)
@@ -340,6 +405,51 @@ function CloudSmokeWidget(props) {
     setHint(text)
     if (hintOffRef.current) { hintOffRef.current(); hintOffRef.current = null }
     hintOffRef.current = timer.timeout(() => { setHint(''); hintOffRef.current = null }, 1800)
+  }
+
+  const copyText = (text, okHint) => {
+    const done = () => showHint(okHint)
+    const fallback = () => {
+      try {
+        const ta = document.createElement('textarea')
+        ta.value = text
+        ta.style.position = 'fixed'
+        ta.style.opacity = '0'
+        document.body.appendChild(ta)
+        ta.select()
+        document.execCommand('copy')
+        document.body.removeChild(ta)
+        done()
+      } catch (e) {
+        showHint('复制失败，请手动复制')
+      }
+    }
+    if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(fallback)
+    } else {
+      fallback()
+    }
+  }
+
+  const openRepo = () => {
+    const win = (typeof window !== 'undefined' && window) || null
+    if (!win || typeof win.open !== 'function') {
+      copyText(REPO_URL, '浏览器打开受限，链接已复制')
+      return
+    }
+    const w = win.open(REPO_URL, '_blank', 'noopener')
+    if (!w) copyText(REPO_URL, '浏览器打开受限，链接已复制')
+  }
+
+  const updatePromptText = () => '云抽烟插件有新版本 v' + (update.version || '?') + '，帮我更新到最新版并重新安装：' + REPO_URL + '\n\n按 README 的「正式安装」流程操作：进入 plugin/ 目录打包 tgz → 更新 ~/.dsh/profiles/desktop/package.json 的依赖指向新 tgz → pnpm install → 完成后提醒我重启 DSH。'
+
+  const runUpdateCheck = () => {
+    setUpdate((u) => (u.status === 'checking' ? u : { ...u, status: 'checking' }))
+    fetchUpdateVersion().then((v) => {
+      if (v === null) setUpdate({ status: 'error', version: null })
+      else if (compareVersions(v, VERSION) > 0) setUpdate({ status: 'new', version: v })
+      else setUpdate({ status: 'latest', version: v })
+    })
   }
 
   const ensureAudioCtx = () => {
@@ -721,6 +831,22 @@ function CloudSmokeWidget(props) {
     return () => off()
   }, [trayTipTick])
 
+  React.useEffect(() => {
+    let alive = true
+    const check = () => {
+      setUpdate((u) => (u.status === 'checking' ? u : { ...u, status: 'checking' }))
+      fetchUpdateVersion().then((v) => {
+        if (!alive) return
+        if (v === null) setUpdate({ status: 'error', version: null })
+        else if (compareVersions(v, VERSION) > 0) setUpdate({ status: 'new', version: v })
+        else setUpdate({ status: 'latest', version: v })
+      })
+    }
+    const off1 = timer.timeout(check, 1500)
+    const off2 = timer.interval(check, 6 * 3600 * 1000)
+    return () => { alive = false; off1(); off2() }
+  }, [])
+
   React.useEffect(() => () => {
     stopHold()
     stopBurnLoop()
@@ -769,6 +895,7 @@ function CloudSmokeWidget(props) {
 
   const pct = Math.round((1 - burn) * 100)
   const statusText = !lit ? T.idle : (burnedOut ? T.done : T.lit.replace('%p%', String(pct)))
+  const hasUpdate = update.status === 'new'
 
   const moundW = pile === 0 ? 0 : Math.min(62, 14 + pile * 3)
   const moundH = pile === 0 ? 0 : Math.min(9, 3 + pile * 0.45)
@@ -820,6 +947,12 @@ function CloudSmokeWidget(props) {
           'aria-label': muted ? '开启声音' : '关闭声音',
           onClick: toggleMute
         }, muted ? '🔇' : '🔊'),
+        React.createElement('button', {
+          className: hasUpdate ? 'ycs-ghost badge' : 'ycs-ghost',
+          title: hasUpdate ? '发现新版本 v' + update.version + '，点击查看' : '派烟给朋友 · 邀请一起云抽烟',
+          'aria-label': '派烟给朋友',
+          onClick: () => setPanelOpen(true)
+        }, hasUpdate ? '🆕' : '🚬'),
         React.createElement('button', {
           className: 'ycs-ghost',
           title: '收起为悬浮球',
@@ -972,6 +1105,58 @@ function CloudSmokeWidget(props) {
       ),
       React.createElement('div', { className: 'ycs-foot' },
         hint ? hint : T.hint
+      ),
+      panelOpen && React.createElement('div', { className: 'ycs-panel', role: 'dialog', 'aria-label': '派烟给朋友' },
+        React.createElement('div', { className: 'ycs-panel-head' },
+          React.createElement('span', { className: 'ycs-panel-title' }, '🚬 派烟给朋友 · 一起云抽烟'),
+          React.createElement('button', {
+            className: 'ycs-ghost',
+            title: '关闭',
+            'aria-label': '关闭面板',
+            onClick: () => setPanelOpen(false)
+          }, '×')
+        ),
+        React.createElement('div', { className: 'ycs-panel-hero' },
+          React.createElement('div', { className: 'ycs-hero-emoji' }, '☁️🚬'),
+          React.createElement('div', { className: 'ycs-hero-line1' }, '等待 AI 时，来根虚拟香烟'),
+          React.createElement('div', { className: 'ycs-hero-line2' }, '六种主题氛围 · 真实烟雾烟圈 · 原创音效')
+        ),
+        React.createElement('div', { className: 'ycs-repo' }, REPO_URL),
+        React.createElement('div', { className: 'ycs-panel-row' },
+          React.createElement('button', { className: 'ycs-panel-btn primary', onClick: () => copyText(REPO_URL, '仓库链接已复制') }, '📋 复制链接'),
+          React.createElement('button', { className: 'ycs-panel-btn open', onClick: openRepo }, '🔗 打开仓库')
+        ),
+        React.createElement('div', { className: 'ycs-panel-row' },
+          React.createElement('button', { className: 'ycs-panel-btn primary', onClick: () => copyText(INVITE_TEXT, '邀请话术已复制，发给朋友吧') }, '💬 复制邀请话术')
+        ),
+        React.createElement('div', { className: 'ycs-panel-star' },
+          React.createElement('span', null, '觉得好玩？点个 '),
+          React.createElement('span', {
+            className: 'ycs-star',
+            title: '去仓库点 Star',
+            role: 'button',
+            tabIndex: 0,
+            onClick: openRepo,
+            onKeyDown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRepo() } }
+          }, '⭐'),
+          React.createElement('span', null, ' Star 支持一下，让更多人一起云抽烟')
+        ),
+        React.createElement('div', { className: 'ycs-divider' }),
+        React.createElement('div', { className: 'ycs-panel-upd' },
+          React.createElement('div', { className: 'ycs-upd-row' },
+            React.createElement('span', null, '当前版本 v' + VERSION),
+            update.status === 'new' && React.createElement('span', { className: 'ycs-upd-new' }, '🆕 最新 v' + update.version),
+            update.status === 'latest' && React.createElement('span', { className: 'ycs-upd-ok' }, '✓ 已是最新'),
+            update.status === 'checking' && React.createElement('span', { className: 'ycs-upd-txt' }, '检查中…'),
+            update.status === 'error' && React.createElement('span', { className: 'ycs-upd-err' }, '更新源连不上（GitHub 网络波动）')
+          ),
+          update.status === 'new' && React.createElement('div', { className: 'ycs-panel-row' },
+            React.createElement('button', { className: 'ycs-panel-btn primary', onClick: () => copyText(updatePromptText(), '更新指令已复制，发给 DSH 即可自动安装') }, '⬆️ 复制一键更新指令')
+          ),
+          React.createElement('div', { className: 'ycs-panel-row' },
+            React.createElement('button', { className: 'ycs-panel-btn', onClick: runUpdateCheck }, '🔄 检查更新')
+          )
+        )
       )
     )
   )
